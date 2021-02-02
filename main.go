@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/faagerholm/lunch-bot/pkg/config"
 	"github.com/faagerholm/lunch-bot/pkg/web"
@@ -71,13 +71,15 @@ func getInlineResultsConf(update tgbotapi.Update) tgbotapi.InlineConfig {
 	var results []interface{}
 	//TODO: move restaurants to constans
 
-	for idx, r := range []string{"Kåren", "Gado", "Arken"} {
-		if !strings.Contains(strings.ToLower(r), strings.ToLower(update.InlineQuery.Query)) {
+	millis := time.Millisecond
+	for key, _ := range config.RestaurantList() {
+		if !strings.Contains(strings.ToLower(key), strings.ToLower(update.InlineQuery.Query)) {
 			continue
 		}
-		restaurant := tgbotapi.NewInlineQueryResultArticle(fmt.Sprint(idx), r, r)
+		restaurant := tgbotapi.NewInlineQueryResultArticle(millis.String(), key, key)
 		restaurant.Description = update.InlineQuery.Query
 		results = append(results, restaurant)
+		millis++
 	}
 
 	return tgbotapi.InlineConfig{
